@@ -1,32 +1,62 @@
 version: '3.8'
 
 services:
+  jenkins:
+      image: jenkins/jenkins:lts
+      container_name: jenkins
+      ports:
+        - "8080:8080"
+        - "50000:50000"
+      volumes:
+        - jenkins_home:/var/jenkins_home
+      environment:
+        JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+
   db:
     image: postgres:latest
+    networks:
+      - my-network
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  app:
-    build: .
-    depends_on:
-      - db
-    ports:
-      - "3000:3000"
-    environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: postgres
-    volumes:
-      - .:/usr/src/app
-    command: npm run dev
+  # app:
+  #   image: node:16
+  #   # build:
+  #   #   context: .
+  #   #   dockerfile: Dockerfile
+  #   env_file:
+  #     - .env 
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - my-network
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #     DB_USER: ${POSTGRES_USER}
+  #     DB_PASSWORD: ${POSTGRES_PASSWORD}
+  #     DB_NAME: ${POSTGRES_DB}
+  #   volumes:
+  #     - .:/usr/src/app
+  #   working_dir: /usr/src/app
+  #   command: sh -c "npm install && npm run dev"
 
 volumes:
   postgres_data:
+  jenkins_home:
+
+networks:
+  my-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24

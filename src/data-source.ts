@@ -1,18 +1,20 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
+import dotenv from 'dotenv';
 import { User } from "./entities/User";
+dotenv.config();
 
 export const AppDataSource = new DataSource({
-  type: "mysql",
+  type: "postgres",
   host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT || "3306"),
-  username: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "Aa1993423.",
-  database: process.env.DB_NAME || "mysql",
+  port: parseInt(process.env.DB_PORT || "3000"),
+  username: process.env.DB_USER || "postgres",
+  password: process.env.DB_PASSWORD || "postgres",
+  database: process.env.DB_NAME || "postgres",
   synchronize: true, // 仅在开发环境中使用，生产环境应关闭
   logging: true,
   entities: [User],
-  migrations: [],
+  migrations: ['src/migrations/*.ts'],
   subscribers: [],
 });
 
