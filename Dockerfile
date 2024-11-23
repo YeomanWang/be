@@ -8,13 +8,13 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # 安装项目依赖
-RUN npm install
+RUN yarn
 
 # 安装 ts-node 和 TypeScript
-RUN npm install --save-dev ts-node typescript @types/node @types/express
+# RUN npm install --save-dev ts-node typescript @types/node @types/express
 
 # 复制项目文件
-COPY . .
+COPY src/ ./src/
 
 # 暴露端口
 EXPOSE 3000

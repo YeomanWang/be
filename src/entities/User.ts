@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
 
 @Entity()
 export class User {
@@ -11,9 +11,15 @@ export class User {
   @Column()
   email: string;
 
-  constructor(id: number, name: string, email: string) {
+  @Column()
+  password!: string; // 新增密码字段
+
+  constructor(id: number, name: string, email: string, password: string) {
     this.id = id;
     this.name = name;
     this.email = email;
+    this.password = password
   }
 }
+
+
