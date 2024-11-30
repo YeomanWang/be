@@ -7,7 +7,7 @@ export class AuthService {
   private userRepository = AppDataSource.getRepository(User);
 
   // 登录逻辑
-  async login(username: string, password: string): Promise<string | null> {
+  async login(username: string, password: string): Promise<{ token: string; user: Partial<User> }> {
     const user = await this.userRepository.findOneBy({ name: username });
     if (!user) {
       throw new Error('用户名不存在');
@@ -22,7 +22,14 @@ export class AuthService {
 
     // 生成 JWT
     const token = generateToken({ id: user.id, username: user.name });
-    return token;
+    return {
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      }
+    };
   }
 
   async register(username: string, password: string, email: string): Promise<string> {
@@ -49,8 +56,6 @@ export class AuthService {
 
   async verifyPassword(inputPassword: string, storedHash: string): Promise<boolean> {
     const [salt, storedDerivedKey] = storedHash.split(':');
-    console.log(salt);
-    console.log(storedDerivedKey);
     const hash = await new Promise<string>((resolve, reject) => {
       scrypt(inputPassword, salt, 64, (err, derivedKey) => {
         if (err) reject(err);
