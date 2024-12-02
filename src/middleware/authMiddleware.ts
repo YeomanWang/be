@@ -6,11 +6,13 @@ const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
 
   if (!authHeader) {
     res.status(401).json({ message: 'Unauthorized' });
+    return ;
   }
 
   const token = authHeader.split(' ')[1]; // 提取 Bearer 后的 token
   if (!token) {
     res.status(401).json({ message: 'Invalid token' });
+    return ;
   }
 
   try {
