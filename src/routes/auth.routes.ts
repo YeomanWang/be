@@ -6,6 +6,7 @@ const authService = new AuthService();
 
 // 登录接口
 router.post('/login', async (req, res) => {
+  console.log(req);
   const { username, password } = req.body;
 
   try {
