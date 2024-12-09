@@ -7,7 +7,7 @@ export class Photos {
   id!: number;
 
   @Column('json')
-  photos!: string[]; // 照片的路径或URL
+  photo!: string; // 照片的路径或URL
 
   @Column()
   age!: number; // 年龄字段

@@ -8,7 +8,6 @@ export class PhotoService {
   async getPhotosByUserId(userId: number) {
     return await this.photoRepository.find({
       where: { userId },
-      relations: ['user'], // 加载User表数据
     });
   }
 
@@ -19,22 +18,24 @@ export class PhotoService {
     });
   }
 
+  async getPhotosByUserIdAndAgeWithPagination(userId: number, age: number, page: number, limit: number) {
+    return await this.photoRepository.find({
+      where: { userId, age },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  }
+
   async savePhoto(photoData: { userId: number; age: number; photos: string[] }) {
-    const existingPhoto = await this.photoRepository.findOne({
-      where: {
+
+    const photoRecords = photoData.photos.map((photoPath) => {
+      return this.photoRepository.create({
         userId: photoData.userId,
         age: photoData.age,
-      },
+        photo: photoPath, // 每张照片单独存储
+      });
     });
 
-    if (existingPhoto) {
-      // 如果找到了对应年龄的照片记录，则将新的照片路径添加到该记录的 photos 字段中
-      existingPhoto.photos.push(...photoData.photos); // 合并新照片
-      return await this.photoRepository.save(existingPhoto); // 更新该记录
-    } else {
-      // 如果没有该年龄的记录，则创建一条新的记录
-      const newPhoto = this.photoRepository.create(photoData);
-      return await this.photoRepository.save(newPhoto); // 保存新记录
-    }
+    return await this.photoRepository.save(photoRecords);
   }
 }

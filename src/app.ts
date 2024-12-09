@@ -15,8 +15,11 @@ if (!fs.existsSync(uploadsDir)) {
 
 const app = express();
 const port = 3000;
-// app.use(express.json({ limit: '50mb' })); // 增加请求体大小限制
-// app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: '50mb' })); // 增加请求体大小限制
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// 配置静态资源目录
+app.use('/uploads', express.static(uploadsDir));
 
 // 设置请求超时
 app.use((req, res, next) => {
@@ -25,6 +28,11 @@ app.use((req, res, next) => {
     res.status(408).send('Request Timeout');
   });
   next();
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack); // 打印错误堆栈信息
+  res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
 
 app.use(cors({

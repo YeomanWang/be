@@ -8,7 +8,6 @@ const photoService = new PhotoService();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log(1111111);
     cb(null, 'uploads/'); // 设置上传文件的存储目录
   },
   filename: (req, file, cb) => {
@@ -20,9 +19,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ 
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 限制文件大小为 5MB
+  limits: { fileSize: 10 * 1024 * 1024 }, // 限制文件大小为 5MB
   fileFilter: (req, file, cb) => {
-    console.log(2222222);
     if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
       cb(null, true);
     } else {
@@ -48,8 +46,10 @@ router.get('/photos/:userId', authMiddleware, async (req, res) => {
 router.get('/photos/:userId/:age', authMiddleware, async (req, res) => {
   const userId = parseInt(req.params.userId);
   const age = parseInt(req.params.age);
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 5;
   try {
-    const photos = await photoService.getPhotosByUserIdAndAge(userId, age);
+    const photos = await photoService.getPhotosByUserIdAndAgeWithPagination(userId, age, page, limit);
     res.json(photos);
   } catch (error) {
     if (error instanceof Error) {
@@ -59,9 +59,7 @@ router.get('/photos/:userId/:age', authMiddleware, async (req, res) => {
 });
 
 router.post('/photos/upload', upload.array('photos',10), async (req, res) => {
-  const {age, userId, photos} = req.body;
-  console.log(photos);
-  console.log(req.files);
+  const {age, userId} = req.body;
   if (!req.files || req.files.length === 0) {
     res.status(400).json({ message: '请上传照片' });
     return;
