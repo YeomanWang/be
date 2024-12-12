@@ -1,12 +1,12 @@
 import express from 'express';
 import { AuthService } from '../services/auth.service';
+import { generateToken, verifyToken} from '../utils/jwt.util';
 
 const router = express.Router();
 const authService = new AuthService();
 
 // 登录接口
 router.post('/login', async (req, res) => {
-  console.log(req);
   const { username, password } = req.body;
 
   try {
@@ -15,13 +15,31 @@ router.post('/login', async (req, res) => {
       return
     }
 
-    const {token, user} = await authService.login(username, password);
-    res.status(200).json({ success: true, token, user });
+    const {token, refreshToken, user} = await authService.login(username, password);
+    res.status(200).json({ success: true, refreshToken, token, user });
   } catch (error) {
     if (error instanceof Error) {
       console.error('登录错误:', error.message);
       res.status(401).json({ success: false, message: error.message });
     }
+  }
+});
+
+router.post('/refresh-token', async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    res.status(400).json({ message: 'Refresh Token 不能为空' });
+    return;
+  }
+
+  try {
+    const decoded = verifyToken(refreshToken) as {id: string, username: string};
+    const token = generateToken({ id: decoded.id, username: decoded.username }, '15m');
+    res.status(200).json({ success: true, token });
+  } catch (error) {
+    console.error('刷新 Token 错误:', error);
+    res.status(401).json({ success: false, message: 'Refresh Token 无效' });
   }
 });
 
