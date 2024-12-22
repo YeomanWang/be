@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Photos } from './Photos';
+import { Videos } from './Videos';
 
 @Entity()
 export class User {
@@ -17,6 +18,9 @@ export class User {
 
   @OneToMany(() => Photos, (photo) => photo.user)
   photos!: Photos[]; // 一对多关系，一个用户可以有多张照片
+
+  @OneToMany(() => Videos, (video) => video.user)
+  videos!: Videos[]; // 一对多关系，一个用户可以有多个视频
 
   constructor(id: number, name: string, email: string, password: string) {
     this.id = id;
