@@ -4,6 +4,7 @@ import { AppDataSource } from './data-source';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import photosRoutes from './routes/photo.routes';
+import videosRoutes from './routes/videos.routes';
 import fs from 'fs';
 import path from 'path';
 
@@ -61,6 +62,7 @@ app.get('/', (req, res) => {
 app.use('/api', userRoutes);
 app.use('/api', authRoutes);
 app.use('/api', photosRoutes);
+app.use('/api', videosRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

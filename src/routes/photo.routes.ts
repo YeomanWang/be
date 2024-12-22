@@ -11,7 +11,6 @@ const storage = multer.diskStorage({
     cb(null, 'uploads/'); // 设置上传文件的存储目录
   },
   filename: (req, file, cb) => {
-    console.log(file);
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, `${file.fieldname}-${uniqueSuffix}.${file.mimetype.split('/')[1]}`);
   },
