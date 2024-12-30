@@ -11,23 +11,40 @@ interface Chunk {
   filePath: string;
 }
 
-const chunks: Chunk[] = [];
 export class VideosService {
   private videoRepository = AppDataSource.getRepository(Videos);
+  private chunksMap = new Map<string, Chunk[]>();
   saveChunk = async (chunk: Chunk): Promise<void> => {
-    chunks.push(chunk);
+    if (!this.chunksMap.has(chunk.videoId)) {
+      this.chunksMap.set(chunk.videoId, []);
+    }
+    const videoChunks = this.chunksMap.get(chunk.videoId)!;
+    const isDuplicate = videoChunks.some(existingChunk => existingChunk.chunkIndex === chunk.chunkIndex);
+    if (isDuplicate) {
+      console.log(`Chunk ${chunk.chunkIndex} of video ${chunk.videoId} already exists. Skipping upload.`);
+      return; 
+    }
+    videoChunks.push(chunk);
   };
 
   isUploadComplete = async (videoId: string, totalChunks: string): Promise<boolean> => {
-    const uploadedChunks = chunks.filter(chunk => chunk.videoId === videoId);
-    console.log( uploadedChunks.length, parseInt(totalChunks,10))
-    return uploadedChunks.length === parseInt(totalChunks,10);
+    const uploadedChunks = this.chunksMap.get(videoId) || [];
+    const totalChunksNumber = parseInt(totalChunks, 10);
+    console.log(uploadedChunks.length, totalChunksNumber);
+
+    if (isNaN(totalChunksNumber)) {
+      throw new Error(`Invalid totalChunks value: ${totalChunks}`);
+    }
+
+    return uploadedChunks.length === totalChunksNumber;
   };
   
   mergeChunks = async (videoId: string, totalChunks: number): Promise<void> => {
-    const uploadedChunks = chunks.filter(chunk => chunk.videoId === videoId);
+    console.log(videoId, totalChunks);
+    // const uploadedChunks = chunks.filter(chunk => chunk.videoId === videoId);
+    const uploadedChunks = this.chunksMap.get(videoId) || [];
     const sortedChunks = uploadedChunks.sort((a, b) => a.chunkIndex - b.chunkIndex);
-  
+    console.log(uploadedChunks);
     const videoPath = path.join('uploads', `${videoId}.mp4`);
     const writeStream = fs.createWriteStream(videoPath);
   
