@@ -40,14 +40,13 @@ export class VideosService {
   };
   
   mergeChunks = async (videoId: string, totalChunks: number): Promise<void> => {
-    console.log(videoId, totalChunks);
-    // const uploadedChunks = chunks.filter(chunk => chunk.videoId === videoId);
     const uploadedChunks = this.chunksMap.get(videoId) || [];
     const sortedChunks = uploadedChunks.sort((a, b) => a.chunkIndex - b.chunkIndex);
-    console.log(uploadedChunks);
     const videoPath = path.join('uploads', `${videoId}.mp4`);
     const writeStream = fs.createWriteStream(videoPath);
-  
+    writeStream.on("error", (err) => {
+      throw new Error(`Error writing to the output file: ${err}`);
+    });
     for (const chunk of sortedChunks) {
       const data = fs.readFileSync(chunk.filePath);
       writeStream.write(data);

@@ -35,13 +35,11 @@ router.post('/videos/upload', upload.single('chunk'), async (req, res) => {
       videoId,
       chunkIndex: parseInt(chunkIndex, 10),
       totalChunks: parseInt(totalChunks, 10),
-      // filePath: `/uploads/${req.file.filename}`,
       filePath: req.file.path,
     });
 
     // 检查是否所有分片都已上传完成
     const isComplete = await videoService.isUploadComplete(videoId, totalChunks);
-    console.log(isComplete);
     if (isComplete) {
       // 合并分片
       await videoService.mergeChunks(videoId, totalChunks);
