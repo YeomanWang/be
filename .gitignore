@@ -2,5 +2,6 @@
 /dist
 /yarn.lock
 /package-lock.json
-/.env
+/.env.development
+/.env.production
 /uploads

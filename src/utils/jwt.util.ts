@@ -1,8 +1,10 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-dotenv.config();
+const environment = process.env.NODE_ENV || 'development';
+const envFile = `.env.${environment}`;
+dotenv.config({ path: envFile });
 
-const SECRET_KEY = process.env.SECRET_KEY; // 建议放在环境变量中
+const SECRET_KEY = process.env.SECRET_KEY;
 if (!SECRET_KEY) {
   console.error('SECRET_KEY is not defined in the environment variables');
   process.exit(1); // 如果没有 SECRET_KEY，终止应用

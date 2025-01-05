@@ -4,7 +4,12 @@ import dotenv from 'dotenv';
 import { User } from "./entities/User";
 import { Photos } from './entities/Photos';
 import { Videos } from './entities/Videos';
-dotenv.config();
+console.log(process.env.NODE_ENV);
+const environment = process.env.NODE_ENV || 'development';
+const envFile = `.env.${environment}`;
+console.log(`Using environment: ${environment}`);
+console.log(`Loading env file: ${envFile}`);
+dotenv.config({ path: envFile });
 
 export const AppDataSource = new DataSource({
   type: "postgres",

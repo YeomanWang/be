@@ -45,7 +45,7 @@ export class VideosService {
     const videoPath = path.join('uploads', `${videoId}.mp4`);
     const writeStream = fs.createWriteStream(videoPath);
     writeStream.on("error", (err) => {
-      throw new Error(`Error writing to the output file: ${err}`);
+      throw new Error(err.message);
     });
     for (const chunk of sortedChunks) {
       const data = fs.readFileSync(chunk.filePath);

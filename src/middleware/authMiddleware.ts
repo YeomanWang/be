@@ -1,5 +1,9 @@
 import jwt from 'jsonwebtoken';
 import {Request, Response, NextFunction} from 'express';
+import dotenv from 'dotenv';
+const environment = process.env.NODE_ENV || 'development';
+const envFile = `.env.${environment}`;
+dotenv.config({ path: envFile });
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
